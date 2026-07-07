@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provider Dashboard — Pawstop</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<link rel="stylesheet" href="../css/forms.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="headerMount"></div>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar" id="dashSidebar">
+    <span class="side-label">Overview</span>
+    <a href="#" data-panel="overview" class="active"><span class="ic">📊</span> Dashboard</a>
+    <a href="#" data-panel="business"><span class="ic">🏪</span> Business Profile</a>
+    <span class="side-label">Services & Content</span>
+    <a href="#" data-panel="services"><span class="ic">🧾</span> Services</a>
+    <a href="#" data-panel="create-post"><span class="ic">➕</span> Create Post</a>
+    <a href="#" data-panel="my-posts"><span class="ic">🖼️</span> My Posts</a>
+    <span class="side-label">Bookings</span>
+    <a href="#" data-panel="requests"><span class="ic">📥</span> Booking Requests</a>
+    <a href="#" data-panel="calendar"><span class="ic">🗓️</span> Calendar</a>
+    <a href="#" data-panel="customers"><span class="ic">👥</span> Customers</a>
+    <span class="side-label">Growth</span>
+    <a href="#" data-panel="messages"><span class="ic">💬</span> Messages</a>
+    <a href="#" data-panel="reviews"><span class="ic">⭐</span> Reviews</a>
+    <a href="#" data-panel="analytics"><span class="ic">📈</span> Analytics</a>
+    <a href="#" data-panel="earnings"><span class="ic">💰</span> Earnings</a>
+    <a href="#" data-panel="promotions"><span class="ic">🏷️</span> Promotions</a>
+    <a href="#" data-panel="coupons"><span class="ic">🎟️</span> Coupons</a>
+    <a href="#" data-panel="followers"><span class="ic">🧑‍🤝‍🧑</span> Followers</a>
+    <span class="side-label">Account</span>
+    <a href="#" data-panel="settings"><span class="ic">⚙️</span> Settings</a>
+    <a href="#" id="logoutLink"><span class="ic">🚪</span> Log Out</a>
+  </aside>
+
+  <div class="dash-main">
+    <div class="dash-header">
+      <div><button class="icon-btn mobile-toggle" id="sidebarToggle" style="display:none">☰</button><h1 id="pageTitle">Provider Dashboard</h1></div>
+      <button class="btn btn-primary" id="quickPostBtn">+ New Post</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section data-panel-content="overview">
+      <div class="widget-row">
+        <div class="card widget"><div class="w-top"><span class="w-icon">📅</span></div><div class="w-value" id="wBookings">0</div><div class="w-label">Total Bookings</div><div class="w-delta up">+ live demo data</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">💰</span></div><div class="w-value" id="wRevenue">$0</div><div class="w-label">Revenue</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">👥</span></div><div class="w-value" id="wCustomers">0</div><div class="w-label">Customers</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">⭐</span></div><div class="w-value" id="wRating">0</div><div class="w-label">Average Rating</div></div>
+      </div>
+      <div class="widget-row">
+        <div class="card widget"><div class="w-top"><span class="w-icon">🧑‍🤝‍🧑</span></div><div class="w-value" id="wFollowers">0</div><div class="w-label">Followers</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">🖼️</span></div><div class="w-value" id="wPosts">0</div><div class="w-label">Total Posts</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">📝</span></div><div class="w-value" id="wReviews">0</div><div class="w-label">Total Reviews</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">👁️</span></div><div class="w-value" id="wViews">0</div><div class="w-label">Profile Views</div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h3>Recent Booking Requests</h3><a href="#" data-panel="requests" class="btn btn-ghost btn-sm">View all</a></div><div id="overviewRequests"></div></div>
+    </section>
+
+    <!-- BUSINESS PROFILE -->
+    <section data-panel-content="business" style="display:none">
+      <div class="card" style="padding:26px; max-width:640px;">
+        <form id="businessForm">
+          <div class="form-group"><label>Business Name</label><input class="form-control" name="name"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Category</label><select class="form-control" name="category"></select></div>
+            <div class="form-group"><label>City</label><input class="form-control" name="city"></div>
+          </div>
+          <div class="form-group"><label>About</label><textarea class="form-control" name="about"></textarea></div>
+          <div class="form-group"><label>Working Hours</label><input class="form-control" name="hours"></div>
+          <div class="form-group"><label class="check-row"><input type="checkbox" name="availableToday"> Available today</label></div>
+          <button class="btn btn-primary" type="submit">Save Business Profile</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section data-panel-content="services" style="display:none">
+      <div class="panel-head" style="margin-bottom:6px;"><h3>My Services</h3><button class="btn btn-primary btn-sm" id="addServiceBtn">+ Create Service</button></div>
+      <div class="grid grid-3" id="myServicesGrid" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- CREATE POST -->
+    <section data-panel-content="create-post" style="display:none">
+      <div class="card" style="padding:26px; max-width:640px;">
+        <form id="createPostForm">
+          <div class="form-group">
+            <label>Images</label>
+            <div class="upload-drop" id="uploadDrop">📷 Click to upload images (up to 5)</div>
+            <input type="file" name="images" accept="image/*" multiple style="display:none;">
+            <div class="img-preview-strip" id="imgPreviewStrip"></div>
+          </div>
+          <div class="form-group" data-field="title"><label>Title</label><input class="form-control" name="title" placeholder="e.g. Spring grooming special!"><span class="form-error">Title is required.</span></div>
+          <div class="form-group"><label>Description</label><textarea class="form-control" name="desc" placeholder="Describe your offer..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Category</label><select class="form-control" name="category"></select></div>
+            <div class="form-group"><label>Price ($)</label><input class="form-control" type="number" name="price" min="0"></div>
+          </div>
+          <div class="form-group"><label>Tags (comma separated)</label><input class="form-control" name="tags" placeholder="petcare, promo, weekend"></div>
+          <div class="form-group"><label class="check-row"><input type="checkbox" name="promo"> Mark as Promotion</label></div>
+          <div style="display:flex; gap:12px;">
+            <button class="btn btn-primary" type="submit">Publish Post</button>
+            <button class="btn btn-ghost" type="button" id="saveDraftBtn">Save Draft</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- MY POSTS -->
+    <section data-panel-content="my-posts" style="display:none">
+      <div class="tabs" data-tabgroup="posts">
+        <button class="active" data-tab="published">Published</button>
+        <button data-tab="draft">Drafts</button>
+      </div>
+      <div class="grid grid-3" data-tabpanel="posts" data-tab="published" id="publishedPostsGrid"></div>
+      <div class="grid grid-3" data-tabpanel="posts" data-tab="draft" id="draftPostsGrid" style="display:none"></div>
+    </section>
+
+    <!-- BOOKING REQUESTS -->
+    <section data-panel-content="requests" style="display:none">
+      <div class="card" style="padding:8px 8px 20px;"><div id="requestsTable"></div></div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section data-panel-content="calendar" style="display:none">
+      <div class="card" style="padding:24px;">
+        <div class="panel-head"><h3 id="calMonthLabel"></h3></div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section data-panel-content="customers" style="display:none">
+      <div class="card" style="padding:8px 8px 20px;"><div id="customersTable"></div></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section data-panel-content="messages" style="display:none">
+      <div class="chat-shell">
+        <div class="chat-list" id="pChatList"></div>
+        <div class="chat-window">
+          <div class="chat-messages" id="pChatMessages"></div>
+          <form class="chat-input" id="pChatForm">
+            <button type="button" class="icon-btn">😊</button>
+            <button type="button" class="icon-btn">📎</button>
+            <input class="form-control" placeholder="Type a message..." id="pChatInput" autocomplete="off">
+            <button class="btn btn-primary" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section data-panel-content="reviews" style="display:none">
+      <div id="providerReviewsList" style="display:flex; flex-direction:column; gap:14px;"></div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section data-panel-content="analytics" style="display:none">
+      <div class="panel"><div class="panel-head"><h3>Bookings (last 6 weeks)</h3></div><div class="chart-box"><canvas id="bookingsChart"></canvas></div></div>
+      <div class="panel"><div class="panel-head"><h3>Revenue by Category</h3></div><div class="chart-box"><canvas id="categoryChart"></canvas></div></div>
+    </section>
+
+    <!-- EARNINGS -->
+    <section data-panel-content="earnings" style="display:none">
+      <div class="widget-row">
+        <div class="card widget"><div class="w-value" id="earnTotal">$0</div><div class="w-label">Total Earnings</div></div>
+        <div class="card widget"><div class="w-value" id="earnPending">$0</div><div class="w-label">Pending</div></div>
+        <div class="card widget"><div class="w-value" id="earnMonth">$0</div><div class="w-label">This Month</div></div>
+        <div class="card widget"><div class="w-value" id="earnAvg">$0</div><div class="w-label">Avg. Booking Value</div></div>
+      </div>
+      <div class="card" style="padding:8px 8px 20px;"><div id="earningsTable"></div></div>
+    </section>
+
+    <!-- PROMOTIONS -->
+    <section data-panel-content="promotions" style="display:none">
+      <div class="grid grid-3" id="promotionsGrid"></div>
+    </section>
+
+    <!-- COUPONS -->
+    <section data-panel-content="coupons" style="display:none">
+      <div class="panel-head" style="margin-bottom:6px;"><h3>Coupons</h3><button class="btn btn-primary btn-sm" id="addCouponBtn">+ Create Coupon</button></div>
+      <div class="card" style="padding:8px 8px 20px; margin-top:16px;"><div id="couponsTable"></div></div>
+    </section>
+
+    <!-- FOLLOWERS -->
+    <section data-panel-content="followers" style="display:none">
+      <div class="card" style="padding:26px;">
+        <p>Your business currently has <strong id="followerCount">0</strong> followers. Followers see your new posts and promotions first in their feed.</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section data-panel-content="settings" style="display:none">
+      <div class="card" style="padding:26px; max-width:520px;">
+        <h3>Settings</h3>
+        <div class="form-group" style="margin-top:16px;"><label class="check-row"><input type="checkbox" checked> Email me on new bookings</label></div>
+        <div class="form-group"><label class="check-row"><input type="checkbox" checked> Email me on new reviews</label></div>
+        <div class="form-group"><label class="check-row"><input type="checkbox"> Weekly performance summary</label></div>
+        <div class="form-group" style="margin-top:20px;"><label>Theme</label><button class="theme-toggle" id="themeToggleSettings"><span class="knob">☀️</span></button></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="serviceModalTitle">Create Service</h3><button class="modal-close" onclick="PAWSTOP.ui.closeModal('serviceModal')">✕</button></div>
+    <div class="modal-body">
+      <form id="serviceForm">
+        <div class="form-group"><label>Title</label><input class="form-control" name="title" required></div>
+        <div class="form-row">
+          <div class="form-group"><label>Category</label><select class="form-control" name="category"></select></div>
+          <div class="form-group"><label>Price ($)</label><input class="form-control" type="number" name="price" min="0" required></div>
+        </div>
+        <div class="form-group"><label>Duration (minutes)</label><input class="form-control" type="number" name="duration" value="30"></div>
+        <div class="form-group"><label>Description</label><textarea class="form-control" name="desc"></textarea></div>
+        <button class="btn btn-primary btn-block" type="submit">Save Service</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="couponModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Create Coupon</h3><button class="modal-close" onclick="PAWSTOP.ui.closeModal('couponModal')">✕</button></div>
+    <div class="modal-body">
+      <form id="couponForm">
+        <div class="form-group"><label>Coupon Code</label><input class="form-control" name="code" placeholder="PAWS20" required></div>
+        <div class="form-group"><label>Discount (%)</label><input class="form-control" type="number" name="discount" min="1" max="90" required></div>
+        <div class="form-group"><label>Expires</label><input class="form-control" type="date" name="expires"></div>
+        <button class="btn btn-primary btn-block" type="submit">Create Coupon</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="../js/storage.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/providers.js"></script>
+<script src="../js/posts.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = NS.db;
+  const session = NS.auth.requireAuth('provider');
+  if (session){
+    NS.ui.mountChrome('', '../');
+    const provider = db.find('providers', session.providerId);
+    document.getElementById('pageTitle').textContent = `${provider.name} — Dashboard`;
+
+    document.querySelectorAll('select[name=category]').forEach(sel => db.CATEGORIES.forEach(c => sel.add(new Option(c.name, c.id))));
+
+    /* ---------- overview ---------- */
+    function bookingsFor(){ return db.get('bookings').filter(b => b.providerId === provider.id); }
+    function renderOverview(){
+      const bookings = bookingsFor();
+      document.getElementById('wBookings').textContent = bookings.length;
+      document.getElementById('wRevenue').textContent = '$' + bookings.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+b.price,0);
+      document.getElementById('wCustomers').textContent = new Set(bookings.map(b=>b.customerId)).size;
+      document.getElementById('wRating').textContent = provider.rating;
+      document.getElementById('wFollowers').textContent = provider.followers;
+      document.getElementById('wPosts').textContent = db.get('posts').filter(p=>p.providerId===provider.id).length;
+      document.getElementById('wReviews').textContent = db.get('reviews').filter(r=>r.providerId===provider.id).length;
+      document.getElementById('wViews').textContent = provider.profileViews;
+      document.getElementById('overviewRequests').innerHTML = NS.dash.bookingsTableHTML(bookings.filter(b=>b.status==='pending').slice(0,5), {showProvider:false, providerActions:true});
+      NS.dash.bindBookingActions(document.getElementById('overviewRequests'), () => { renderOverview(); renderRequests(); });
+    }
+
+    /* ---------- business profile ---------- */
+    const bizForm = document.getElementById('businessForm');
+    bizForm.name.value = provider.name; bizForm.category.value = provider.category; bizForm.city.value = provider.city;
+    bizForm.about.value = provider.about; bizForm.hours.value = provider.hours; bizForm.availableToday.checked = provider.availableToday;
+    bizForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      db.update('providers', provider.id, { name: bizForm.name.value, category: bizForm.category.value, city: bizForm.city.value, about: bizForm.about.value, hours: bizForm.hours.value, availableToday: bizForm.availableToday.checked });
+      NS.ui.toast('Business profile updated.');
+    });
+
+    /* ---------- services ---------- */
+    function renderMyServices(){
+      const services = db.get('services').filter(s => s.providerId === provider.id);
+      const grid = document.getElementById('myServicesGrid');
+      grid.innerHTML = services.length ? services.map(s => `
+        <div class="card svc-card">
+          <div class="thumb" style="background-image:url('${s.image}')"><span class="tag">${db.CATEGORIES.find(c=>c.id===s.category)?.name}</span></div>
+          <div class="body">
+            <h3>${s.title}</h3><p style="font-size:.85rem">${s.desc}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:8px;">
+              <span class="price">$${s.price}</span>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-ghost btn-sm edit-svc" data-id="${s.id}">Edit</button>
+                <button class="btn btn-ghost btn-sm del-svc" data-id="${s.id}" style="color:var(--danger)">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>`).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🧾</div><p>No services yet — create your first one.</p></div>`;
+    }
+    renderMyServices();
+    const serviceForm = document.getElementById('serviceForm');
+    document.getElementById('addServiceBtn').addEventListener('click', () => { serviceForm.reset(); delete serviceForm.dataset.editId; document.getElementById('serviceModalTitle').textContent='Create Service'; NS.ui.openModal('serviceModal'); });
+    document.getElementById('myServicesGrid').addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.edit-svc'); const delBtn = e.target.closest('.del-svc');
+      if (editBtn){ const s = db.find('services', editBtn.dataset.id); serviceForm.title.value=s.title; serviceForm.category.value=s.category; serviceForm.price.value=s.price; serviceForm.duration.value=s.duration; serviceForm.desc.value=s.desc; serviceForm.dataset.editId=s.id; document.getElementById('serviceModalTitle').textContent='Edit Service'; NS.ui.openModal('serviceModal'); }
+      if (delBtn){ if(confirm('Delete this service?')){ db.remove('services', delBtn.dataset.id); NS.ui.toast('Service deleted.'); renderMyServices(); } }
+    });
+    serviceForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = { title: serviceForm.title.value.trim(), category: serviceForm.category.value, price: Number(serviceForm.price.value), duration: Number(serviceForm.duration.value), desc: serviceForm.desc.value.trim() };
+      if (serviceForm.dataset.editId){ db.update('services', serviceForm.dataset.editId, data); NS.ui.toast('Service updated.'); }
+      else { db.add('services', { id: db.uid('svc'), providerId: provider.id, image:`https://picsum.photos/seed/${db.uid('s')}/500/320`, ...data }); NS.ui.toast('Service created.'); }
+      NS.ui.closeModal('serviceModal'); renderMyServices();
+    });
+
+    /* ---------- posts ---------- */
+    function renderMyPosts(){
+      const all = db.get('posts').filter(p => p.providerId === provider.id);
+      const pub = all.filter(p => p.status !== 'draft');
+      const draft = all.filter(p => p.status === 'draft');
+      document.getElementById('publishedPostsGrid').innerHTML = pub.length ? pub.map(p => NS.cards.postCardHTML(p, '../')).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No published posts yet.</p></div>`;
+      document.getElementById('draftPostsGrid').innerHTML = draft.length ? draft.map(p => `<div class="card" style="padding:16px;"><img src="${p.image}" style="border-radius:var(--r-md); height:140px; width:100%; object-fit:cover; margin-bottom:10px;"><h3>${p.title}</h3><p style="font-size:.85rem">${p.desc}</p></div>`).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No drafts.</p></div>`;
+      NS.cards.bindPostActions(document.getElementById('publishedPostsGrid'));
+      document.getElementById('wPosts').textContent = all.length;
+    }
+    window.renderMyPosts = renderMyPosts;
+    renderMyPosts();
+    document.getElementById('quickPostBtn').addEventListener('click', () => showPanel('create-post'));
+
+    /* ---------- booking requests ---------- */
+    function renderRequests(){
+      document.getElementById('requestsTable').innerHTML = NS.dash.bookingsTableHTML(bookingsFor().sort((a,b)=>b.createdAt-a.createdAt), {showProvider:false, providerActions:true});
+      NS.dash.bindBookingActions(document.getElementById('requestsTable'), () => { renderRequests(); renderOverview(); renderCalendar(); });
+    }
+    renderRequests();
+
+    /* ---------- calendar ---------- */
+    function renderCalendar(){
+      const now = new Date();
+      document.getElementById('calMonthLabel').textContent = now.toLocaleString('default',{month:'long', year:'numeric'});
+      const bookings = bookingsFor();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+      const grid = document.getElementById('calendarGrid');
+      let html = ['S','M','T','W','T','F','S'].map(d=>`<div style="text-align:center;font-size:.75rem;color:var(--ink-soft);font-weight:700;">${d}</div>`).join('');
+      const firstDow = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+      for(let i=0;i<firstDow;i++) html += '<div></div>';
+      for(let d=1; d<=daysInMonth; d++){
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasBooking = bookings.some(b => b.date === dateStr);
+        const isToday = d === now.getDate();
+        html += `<div class="day ${hasBooking?'has-booking':''} ${isToday?'today':''}">${d}</div>`;
+      }
+      grid.innerHTML = html;
+    }
+    renderCalendar();
+
+    /* ---------- customers ---------- */
+    function renderCustomers(){
+      const bookings = bookingsFor();
+      const users = db.get('users');
+      const byCustomer = {};
+      bookings.forEach(b => { byCustomer[b.customerId] = byCustomer[b.customerId] || []; byCustomer[b.customerId].push(b); });
+      const rows = Object.entries(byCustomer).map(([cid, list]) => {
+        const u = users.find(x=>x.id===cid);
+        return `<tr><td>${u?u.name:'Guest'}</td><td>${list.length}</td><td class="price">$${list.reduce((s,b)=>s+b.price,0)}</td><td>${new Date(Math.max(...list.map(b=>b.createdAt))).toLocaleDateString()}</td></tr>`;
+      }).join('');
+      document.getElementById('customersTable').innerHTML = rows ? `<table class="data-table"><thead><tr><th>Customer</th><th>Bookings</th><th>Total Spent</th><th>Last Booking</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty-state"><p>No customers yet.</p></div>`;
+    }
+    renderCustomers();
+
+    /* ---------- messages ---------- */
+    function renderProviderChat(){
+      const msgs = db.get('messages');
+      const partners = [...new Set(msgs.filter(m=>m.from===provider.id || m.to===provider.id).map(m => m.from===provider.id?m.to:m.from))];
+      const users = db.get('users');
+      const list = document.getElementById('pChatList');
+      list.innerHTML = partners.map(uid => { const u = users.find(x=>x.id===uid); return `<div class="c-item" data-uid="${uid}"><span class="av">${u?u.name[0]:'?'}</span><div><strong style="font-size:.88rem">${u?u.name:'Customer'}</strong></div></div>`; }).join('') || `<div class="empty-state"><p>No conversations yet.</p></div>`;
+      if (partners.length) selectPThread(partners[0]);
+    }
+    function selectPThread(uid){
+      document.querySelectorAll('#pChatList .c-item').forEach(i => i.classList.toggle('active', i.dataset.uid===uid));
+      const msgs = db.get('messages').filter(m => (m.from===provider.id && m.to===uid) || (m.from===uid && m.to===provider.id));
+      document.getElementById('pChatMessages').innerHTML = msgs.map(m => `<div class="msg-bubble ${m.from===provider.id?'mine':'theirs'}">${m.text}</div>`).join('');
+      document.getElementById('pChatForm').dataset.activeUid = uid;
+    }
+    document.getElementById('pChatList').addEventListener('click', (e) => { const i=e.target.closest('.c-item'); if(i) selectPThread(i.dataset.uid); });
+    document.getElementById('pChatForm').addEventListener('submit', (e) => {
+      e.preventDefault(); const uid = e.target.dataset.activeUid; const input = document.getElementById('pChatInput');
+      if (!uid || !input.value.trim()) return;
+      const msgs = db.get('messages'); msgs.push({ id: db.uid('msg'), threadId:'t_'+uid, from: provider.id, to: uid, text: input.value.trim(), at: Date.now() }); db.set('messages', msgs);
+      input.value=''; selectPThread(uid);
+    });
+    renderProviderChat();
+
+    /* ---------- reviews ---------- */
+    const revs = db.get('reviews').filter(r => r.providerId === provider.id).sort((a,b)=>b.date-a.date);
+    document.getElementById('providerReviewsList').innerHTML = revs.length ? revs.map(r => `
+      <div class="card" style="padding:18px;"><div style="display:flex; justify-content:space-between;"><strong>${r.author}</strong><span class="stars">${NS.ui.starString(r.rating)}</span></div><p style="margin-top:8px;">${r.text}</p></div>
+    `).join('') : `<div class="empty-state"><p>No reviews yet.</p></div>`;
+
+    /* ---------- analytics (Chart.js) ---------- */
+    function renderAnalytics(){
+      const bookings = bookingsFor();
+      const weeks = [];
+      for(let i=5;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i*7); weeks.push(d); }
+      const weekCounts = weeks.map((wStart,i) => {
+        const wEnd = new Date(wStart); wEnd.setDate(wEnd.getDate()+7);
+        return bookings.filter(b => { const bd = new Date(b.createdAt); return bd>=wStart && bd<wEnd; }).length;
+      });
+      new Chart(document.getElementById('bookingsChart'), {
+        type:'line',
+        data:{ labels: weeks.map(w=>`Wk ${w.getMonth()+1}/${w.getDate()}`), datasets:[{ label:'Bookings', data: weekCounts, borderColor:'#2D6A6A', backgroundColor:'rgba(45,106,106,.15)', fill:true, tension:.35 }] },
+        options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{precision:0}}} }
+      });
+
+      const byCat = {};
+      bookings.forEach(b => { const svc = db.find('services', b.serviceId); const cat = svc ? svc.category : 'other'; byCat[cat] = (byCat[cat]||0) + b.price; });
+      new Chart(document.getElementById('categoryChart'), {
+        type:'doughnut',
+        data:{ labels: Object.keys(byCat).map(k => db.CATEGORIES.find(c=>c.id===k)?.name || k), datasets:[{ data: Object.values(byCat), backgroundColor:['#E8A33D','#2D6A6A','#B85C3E','#C9822A','#1F4E4E'] }] },
+        options:{ plugins:{legend:{position:'bottom'}} }
+      });
+    }
+
+    /* ---------- earnings ---------- */
+    function renderEarnings(){
+      const bookings = bookingsFor().filter(b=>b.status!=='cancelled');
+      const total = bookings.reduce((s,b)=>s+b.price,0);
+      const pending = bookings.filter(b=>b.status==='pending').reduce((s,b)=>s+b.price,0);
+      const now = new Date();
+      const month = bookings.filter(b => { const d=new Date(b.createdAt); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); }).reduce((s,b)=>s+b.price,0);
+      document.getElementById('earnTotal').textContent = '$'+total;
+      document.getElementById('earnPending').textContent = '$'+pending;
+      document.getElementById('earnMonth').textContent = '$'+month;
+      document.getElementById('earnAvg').textContent = '$'+(bookings.length ? Math.round(total/bookings.length) : 0);
+      const rows = bookings.map(b => `<tr><td>${b.date}</td><td>${db.find('services',b.serviceId)?.title||'—'}</td><td class="price">$${b.price}</td><td><span class="status-pill ${b.status}">${b.status}</span></td></tr>`).join('');
+      document.getElementById('earningsTable').innerHTML = rows ? `<table class="data-table"><thead><tr><th>Date</th><th>Service</th><th>Amount</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty-state"><p>No earnings yet.</p></div>`;
+    }
+    renderEarnings();
+
+    /* ---------- promotions ---------- */
+    const promoPosts = db.get('posts').filter(p => p.providerId===provider.id && p.promo);
+    document.getElementById('promotionsGrid').innerHTML = promoPosts.length ? promoPosts.map(p => NS.cards.postCardHTML(p, '../')).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No active promotions. Mark a post as "Promotion" when creating it.</p></div>`;
+    NS.cards.bindPostActions(document.getElementById('promotionsGrid'));
+
+    /* ---------- coupons ---------- */
+    function renderCoupons(){
+      const coupons = db.get('coupons') ? db.get('coupons').filter(c=>c.providerId===provider.id) : [];
+      const rows = coupons.map(c => `<tr><td>${c.code}</td><td>${c.discount}%</td><td>${c.expires||'No expiry'}</td><td><button class="btn btn-ghost btn-sm del-coupon" data-id="${c.id}" style="color:var(--danger)">Delete</button></td></tr>`).join('');
+      document.getElementById('couponsTable').innerHTML = rows ? `<table class="data-table"><thead><tr><th>Code</th><th>Discount</th><th>Expires</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty-state"><p>No coupons yet.</p></div>`;
+    }
+    renderCoupons();
+    document.getElementById('addCouponBtn').addEventListener('click', () => NS.ui.openModal('couponModal'));
+    document.getElementById('couponForm').addEventListener('submit', (e) => {
+      e.preventDefault(); const f = e.target;
+      const coupons = db.get('coupons') || [];
+      coupons.push({ id: db.uid('cp'), providerId: provider.id, code: f.code.value.toUpperCase(), discount: Number(f.discount.value), expires: f.expires.value });
+      db.set('coupons', coupons);
+      NS.ui.closeModal('couponModal'); f.reset(); NS.ui.toast('Coupon created.'); renderCoupons();
+    });
+    document.getElementById('couponsTable').addEventListener('click', (e) => {
+      const btn = e.target.closest('.del-coupon'); if(!btn) return;
+      db.set('coupons', (db.get('coupons')||[]).filter(c=>c.id!==btn.dataset.id)); renderCoupons();
+    });
+
+    /* ---------- followers ---------- */
+    document.getElementById('followerCount').textContent = provider.followers;
+
+    /* ---------- panel switching ---------- */
+    const panels = document.querySelectorAll('[data-panel-content]');
+    function showPanel(name){
+      panels.forEach(p => p.style.display = p.dataset.panelContent === name ? '' : 'none');
+      document.querySelectorAll('[data-panel]').forEach(a => a.classList.toggle('active', a.dataset.panel === name));
+      if (name === 'analytics') renderAnalytics();
+    }
+    document.querySelectorAll('[data-panel]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); showPanel(a.dataset.panel); document.querySelector('.dash-sidebar').classList.remove('open'); }));
+    renderOverview();
+    showPanel(new URLSearchParams(location.search).get('tab') || 'overview');
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); NS.auth.logout('../'); });
+    document.getElementById('themeToggleSettings').addEventListener('click', () => document.getElementById('themeToggle')?.click());
+  }
+</script>
+</body>
+</html>

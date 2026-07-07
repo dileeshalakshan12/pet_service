@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Dashboard — Pawstop</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/dashboard.css">
+<link rel="stylesheet" href="../css/forms.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar" id="dashSidebar">
+    <span class="side-label">Overview</span>
+    <a href="#" data-panel="overview" class="active"><span class="ic">📊</span> Dashboard</a>
+    <span class="side-label">My Account</span>
+    <a href="#" data-panel="pets"><span class="ic">🐾</span> My Pets</a>
+    <a href="#" data-panel="bookings"><span class="ic">📅</span> My Bookings</a>
+    <a href="#" data-panel="saved-providers"><span class="ic">⭐</span> Saved Providers</a>
+    <a href="#" data-panel="saved-posts"><span class="ic">🔖</span> Saved Posts</a>
+    <span class="side-label">Communication</span>
+    <a href="#" data-panel="messages"><span class="ic">💬</span> Messages</a>
+    <a href="#" data-panel="notifications"><span class="ic">🔔</span> Notifications</a>
+    <span class="side-label">Settings</span>
+    <a href="#" data-panel="profile"><span class="ic">👤</span> Profile</a>
+    <a href="#" data-panel="settings"><span class="ic">⚙️</span> Settings</a>
+    <a href="#" id="logoutLink"><span class="ic">🚪</span> Log Out</a>
+  </aside>
+
+  <div class="dash-main">
+    <div class="dash-header">
+      <div><button class="icon-btn mobile-toggle" id="sidebarToggle" style="display:none">☰</button><h1 id="pageTitle">Welcome back 👋</h1></div>
+      <a href="../providers.html" class="btn btn-primary">+ Book a Service</a>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section data-panel-content="overview">
+      <div class="widget-row">
+        <div class="card widget"><div class="w-top"><span class="w-icon">📅</span></div><div class="w-value" id="statUpcoming">0</div><div class="w-label">Upcoming Bookings</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">🐾</span></div><div class="w-value" id="statPets">0</div><div class="w-label">Pets Registered</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">⭐</span></div><div class="w-value" id="statSavedProviders">0</div><div class="w-label">Saved Providers</div></div>
+        <div class="card widget"><div class="w-top"><span class="w-icon">🔔</span></div><div class="w-value" id="statUnread">0</div><div class="w-label">Unread Notifications</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>Upcoming Bookings</h3><a href="#" data-panel="bookings" class="btn btn-ghost btn-sm">View all</a></div>
+        <div id="overviewBookings"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h3>My Pets</h3><a href="#" data-panel="pets" class="btn btn-ghost btn-sm">Manage</a></div>
+        <div class="grid grid-2" id="overviewPets"></div>
+      </div>
+    </section>
+
+    <!-- PETS -->
+    <section data-panel-content="pets" style="display:none">
+      <div class="panel-head" style="margin-bottom:6px;"><h3>My Pets</h3><button class="btn btn-primary btn-sm" id="addPetBtn">+ Add Pet</button></div>
+      <div class="grid grid-2" id="petsList" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- BOOKINGS -->
+    <section data-panel-content="bookings" style="display:none">
+      <div class="tabs" data-tabgroup="bk">
+        <button class="active" data-tab="all">All</button>
+        <button data-tab="pending">Pending</button>
+        <button data-tab="confirmed">Confirmed</button>
+        <button data-tab="completed">Completed</button>
+        <button data-tab="cancelled">Cancelled</button>
+      </div>
+      <div class="card" style="padding:8px 8px 20px;" data-tabpanel="bk" data-tab="all"><div id="bkAll"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="bk" data-tab="pending"><div id="bkPending"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="bk" data-tab="confirmed"><div id="bkConfirmed"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="bk" data-tab="completed"><div id="bkCompleted"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="bk" data-tab="cancelled"><div id="bkCancelled"></div></div>
+    </section>
+
+    <!-- SAVED PROVIDERS -->
+    <section data-panel-content="saved-providers" style="display:none">
+      <div class="grid grid-3" id="savedProvidersGrid"></div>
+    </section>
+
+    <!-- SAVED POSTS -->
+    <section data-panel-content="saved-posts" style="display:none">
+      <div class="grid grid-3" id="savedPostsGrid"></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section data-panel-content="messages" style="display:none">
+      <div class="chat-shell">
+        <div class="chat-list" id="chatList"></div>
+        <div class="chat-window">
+          <div class="chat-messages" id="chatMessages"></div>
+          <form class="chat-input" id="chatForm">
+            <button type="button" class="icon-btn" title="Emoji">😊</button>
+            <button type="button" class="icon-btn" title="Attach">📎</button>
+            <input class="form-control" placeholder="Type a message..." id="chatInputField" autocomplete="off">
+            <button class="btn btn-primary" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section data-panel-content="notifications" style="display:none">
+      <div id="notifList" style="display:flex; flex-direction:column; gap:10px;"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section data-panel-content="profile" style="display:none">
+      <div class="card" style="padding:26px; max-width:520px;">
+        <h3>My Profile</h3>
+        <form id="profileForm" style="margin-top:16px;">
+          <div class="form-group"><label>Full Name</label><input class="form-control" name="name"></div>
+          <div class="form-group"><label>Email</label><input class="form-control" name="email" type="email"></div>
+          <button class="btn btn-primary" type="submit">Save Changes</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section data-panel-content="settings" style="display:none">
+      <div class="card" style="padding:26px; max-width:520px;">
+        <h3>Settings</h3>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="check-row"><input type="checkbox" checked> Email me booking confirmations</label>
+        </div>
+        <div class="form-group"><label class="check-row"><input type="checkbox" checked> Email me new provider posts</label></div>
+        <div class="form-group"><label class="check-row"><input type="checkbox"> Marketing emails</label></div>
+        <div class="form-group" style="margin-top:20px;">
+          <label>Theme</label>
+          <button class="theme-toggle" id="themeToggleSettings"><span class="knob">☀️</span></button>
+        </div>
+        <button class="btn btn-danger" style="margin-top:20px;" id="clearDataBtn">Reset Demo Data</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-overlay" id="petModal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="petModalTitle">Add Pet</h3><button class="modal-close" onclick="PAWSTOP.ui.closeModal('petModal')">✕</button></div>
+    <div class="modal-body">
+      <form id="petForm">
+        <div class="form-row">
+          <div class="form-group"><label>Name</label><input class="form-control" name="name" required></div>
+          <div class="form-group"><label>Species</label>
+            <select class="form-control" name="species"><option>Dog</option><option>Cat</option><option>Bird</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Breed</label><input class="form-control" name="breed"></div>
+          <div class="form-group"><label>Age</label><input class="form-control" type="number" min="0" name="age"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Gender</label><select class="form-control" name="gender"><option>Male</option><option>Female</option></select></div>
+          <div class="form-group"><label>Weight</label><input class="form-control" name="weight" placeholder="e.g. 12 kg"></div>
+        </div>
+        <div class="form-group"><label>Vaccination Status</label>
+          <select class="form-control" name="vaccinated"><option>Up to date</option><option>Due soon</option><option>Not vaccinated</option></select>
+        </div>
+        <div class="form-group"><label>Allergies</label><input class="form-control" name="allergies" placeholder="None known"></div>
+        <div class="form-group"><label>Medical Notes</label><textarea class="form-control" name="notes"></textarea></div>
+        <button class="btn btn-primary btn-block" type="submit">Save Pet</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="../js/storage.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/providers.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = NS.db;
+  const session = NS.auth.requireAuth('customer');
+  if (session){
+    NS.ui.mountChrome('', '../');
+    document.getElementById('pageTitle').textContent = `Welcome back, ${session.name.split(' ')[0]} 👋`;
+
+    function renderPets(){ NS.dash.renderPets(document.getElementById('petsList'), session.id, true); renderOverview(); }
+    NS.dash.bindPetForm('petForm', renderPets, session.id);
+    NS.dash.bindPetListActions(document.getElementById('petsList'), session.id, renderPets);
+    document.getElementById('addPetBtn').addEventListener('click', () => {
+      document.getElementById('petForm').reset(); delete document.getElementById('petForm').dataset.editId;
+      document.getElementById('petModalTitle').textContent = 'Add Pet';
+      NS.ui.openModal('petModal');
+    });
+
+    function myBookings(){ return db.get('bookings').filter(b => b.customerId === session.id).sort((a,b)=>b.createdAt-a.createdAt); }
+    function renderBookings(){
+      const all = myBookings();
+      document.getElementById('bkAll').innerHTML = NS.dash.bookingsTableHTML(all);
+      document.getElementById('bkPending').innerHTML = NS.dash.bookingsTableHTML(all.filter(b=>b.status==='pending'));
+      document.getElementById('bkConfirmed').innerHTML = NS.dash.bookingsTableHTML(all.filter(b=>b.status==='confirmed'));
+      document.getElementById('bkCompleted').innerHTML = NS.dash.bookingsTableHTML(all.filter(b=>b.status==='completed'));
+      document.getElementById('bkCancelled').innerHTML = NS.dash.bookingsTableHTML(all.filter(b=>b.status==='cancelled'));
+      ['bkAll','bkPending','bkConfirmed','bkCompleted','bkCancelled'].forEach(id => NS.dash.bindBookingActions(document.getElementById(id), renderBookings));
+    }
+    renderBookings();
+
+    function renderOverview(){
+      const bookings = myBookings();
+      const upcoming = bookings.filter(b => b.status !== 'cancelled' && b.status !== 'completed');
+      document.getElementById('statUpcoming').textContent = upcoming.length;
+      document.getElementById('statPets').textContent = db.get('pets').filter(p=>p.ownerId===session.id).length;
+      document.getElementById('statSavedProviders').textContent = 0;
+      document.getElementById('statUnread').textContent = db.get('notifications').filter(n=>n.userId===session.id && !n.read).length;
+      document.getElementById('overviewBookings').innerHTML = NS.dash.bookingsTableHTML(upcoming.slice(0,4));
+      NS.dash.renderPets(document.getElementById('overviewPets'), session.id, false);
+    }
+    renderOverview();
+
+    const posts = db.get('posts').filter(p => p.savedByMe);
+    const savedPostsGrid = document.getElementById('savedPostsGrid');
+    savedPostsGrid.innerHTML = posts.length ? posts.map(p => NS.cards.postCardHTML(p, '../')).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔖</div><p>No saved posts yet. Browse the feed and tap Save on posts you like.</p></div>`;
+    NS.cards.bindPostActions(savedPostsGrid);
+
+    document.getElementById('savedProvidersGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">⭐</div><p>You haven't saved any providers yet. Visit a provider's profile and follow them.</p></div>`;
+
+    /* messages (demo, single thread) */
+    const providers = db.get('providers');
+    function renderChat(){
+      const msgs = db.get('messages');
+      const threadPartners = [...new Set(msgs.map(m => m.from === session.id ? m.to : m.from))];
+      const list = document.getElementById('chatList');
+      list.innerHTML = threadPartners.map(pid => {
+        const p = providers.find(pp => pp.id === pid);
+        return `<div class="c-item" data-pid="${pid}"><span class="av">${p?p.name[0]:'?'}</span><div><strong style="font-size:.88rem">${p?p.name:'Unknown'}</strong><div style="font-size:.78rem;color:var(--ink-soft)">Tap to view</div></div></div>`;
+      }).join('') || `<div class="empty-state"><p>No conversations yet.</p></div>`;
+      if (threadPartners.length) selectThread(threadPartners[0]);
+    }
+    function selectThread(pid){
+      document.querySelectorAll('.c-item').forEach(i => i.classList.toggle('active', i.dataset.pid === pid));
+      const msgs = db.get('messages').filter(m => m.from === pid || m.to === pid || m.from === session.id || m.to === session.id)
+        .filter(m => (m.from===session.id && m.to===pid) || (m.from===pid && m.to===session.id));
+      document.getElementById('chatMessages').innerHTML = msgs.map(m => `<div class="msg-bubble ${m.from===session.id?'mine':'theirs'}">${m.text}</div>`).join('');
+      document.getElementById('chatForm').dataset.activePid = pid;
+      document.getElementById('chatMessages').scrollTop = 9999;
+    }
+    document.getElementById('chatList').addEventListener('click', (e) => { const item = e.target.closest('.c-item'); if (item) selectThread(item.dataset.pid); });
+    document.getElementById('chatForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pid = e.target.dataset.activePid; const input = document.getElementById('chatInputField');
+      if (!pid || !input.value.trim()) return;
+      const msgs = db.get('messages');
+      msgs.push({ id: db.uid('msg'), threadId:'t_'+pid, from: session.id, to: pid, text: input.value.trim(), at: Date.now() });
+      db.set('messages', msgs);
+      input.value = ''; selectThread(pid);
+    });
+    renderChat();
+
+    NS.dash.renderNotifications(document.getElementById('notifList'), session.id);
+
+    const profileForm = document.getElementById('profileForm');
+    profileForm.name.value = session.name; profileForm.email.value = session.email;
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        const { token, user } = await NS.api.call('PUT', '/api/auth/me', { name: profileForm.name.value.trim(), email: profileForm.email.value.trim() });
+        NS.api.setSession(token, user);
+        NS.ui.toast('Profile updated.');
+      } catch (err){ NS.ui.toast(err.error || 'Could not update profile.', 'error'); }
+    });
+
+    document.getElementById('clearDataBtn').addEventListener('click', () => {
+      if (confirm('This will erase all demo data and reload the site. Continue?')){ localStorage.clear(); location.href = '../index.html'; }
+    });
+
+    /* sidebar panel switching */
+    const panels = document.querySelectorAll('[data-panel-content]');
+    function showPanel(name){
+      panels.forEach(p => p.style.display = p.dataset.panelContent === name ? '' : 'none');
+      document.querySelectorAll('[data-panel]').forEach(a => a.classList.toggle('active', a.dataset.panel === name));
+    }
+    document.querySelectorAll('[data-panel]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); showPanel(a.dataset.panel); document.querySelector('.dash-sidebar').classList.remove('open'); }));
+    const urlTab = new URLSearchParams(location.search).get('tab');
+    showPanel(urlTab || 'overview');
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); NS.auth.logout('../'); });
+    const themeSettingsBtn = document.getElementById('themeToggleSettings');
+    themeSettingsBtn.addEventListener('click', () => document.getElementById('themeToggle')?.click());
+  }
+</script>
+</body>
+</html>
