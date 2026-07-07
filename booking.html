@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Service — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main class="container section">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <span>Booking</span></div>
+  <div class="section-head" style="max-width:none;">
+    <span class="eyebrow">Almost there</span>
+    <h2>Complete your booking</h2>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:32px; align-items:flex-start;">
+    <form class="card" id="bookingForm" style="padding:30px;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Provider</label>
+          <select class="form-control" name="provider" required></select>
+        </div>
+        <div class="form-group">
+          <label>Service</label>
+          <select class="form-control" name="service" required></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date</label>
+          <input class="form-control" type="date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <select class="form-control" name="time" required>
+            <option value="">Select a time</option>
+            <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+            <option>1:00 PM</option><option>2:00 PM</option><option>3:00 PM</option><option>4:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Pet</label>
+        <select class="form-control" name="pet"></select>
+      </div>
+      <div class="form-group">
+        <label>Notes for the provider (optional)</label>
+        <textarea class="form-control" name="notes" placeholder="Anything the provider should know?"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Confirm Booking</button>
+    </form>
+
+    <div class="card" style="padding:26px; position:sticky; top:100px;">
+      <h3>Order Summary</h3>
+      <div id="bookingSummary" style="margin-top:14px;"></div>
+      <p style="font-size:.8rem; margin-top:8px;">You won't be charged until the provider confirms your booking.</p>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Booking Requested 🎉</h3><button class="modal-close" onclick="PAWSTOP.ui.closeModal('confirmModal')">✕</button></div>
+    <div class="modal-body">
+      <p>Your booking request has been sent. The provider will confirm shortly — you'll get a notification the moment they do.</p>
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <a href="dashboard/customer.html?tab=bookings" class="btn btn-primary btn-block">View My Bookings</a>
+        <a href="index.html" class="btn btn-ghost btn-block">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/booking.js"></script>
+<script>
+  window.PAWSTOP.ui.mountChrome('services', '');
+</script>
+</body>
+</html>

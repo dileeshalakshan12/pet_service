@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .faq-item{ border-bottom:1px solid var(--line); padding:18px 0; }
+  .faq-q{ display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; }
+  .faq-a{ max-height:0; overflow:hidden; transition:max-height .3s var(--ease); color:var(--ink-soft); }
+  .faq-item.open .faq-a{ max-height:200px; padding-top:12px; }
+  .faq-item.open .faq-q .chev{ transform:rotate(180deg); }
+  .faq-q .chev{ transition:.3s; }
+</style>
+</head>
+<body>
+<div id="headerMount"></div>
+<main class="container section" style="max-width:760px;">
+  <div class="section-head" style="max-width:none;">
+    <span class="eyebrow">Support</span>
+    <h2>Frequently asked questions</h2>
+  </div>
+  <div id="faqList" class="card" style="padding:10px 24px;"></div>
+</main>
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script><script src="js/app.js"></script><script src="js/auth.js"></script>
+<script>
+  window.PAWSTOP.ui.mountChrome('', '');
+  const faqs = [
+    ['How do I book a service?', 'Browse providers or services, choose a date and time, select your pet, and confirm. The provider then accepts or declines your request — you\'ll get a notification either way.'],
+    ['Is booking free for pet owners?', 'Yes, browsing and booking is always free for pet parents. Providers pay a small subscription based on their plan.'],
+    ['How do I become a provider?', 'Sign up and choose "I\'m a Provider" during registration. You\'ll get access to your own dashboard to list services, publish posts, and manage bookings.'],
+    ['Can I cancel a booking?', 'Yes — pending bookings can be cancelled from My Bookings in your dashboard. Confirmed bookings may be subject to the provider\'s cancellation policy.'],
+    ['How are providers vetted?', 'Providers list their experience, pricing, and photos, and every completed booking can be reviewed by the customer — so reputation builds transparently over time.'],
+    ['Where is my data stored?', 'This demo build stores all data locally in your browser via localStorage, so it stays on your device and resets if you clear your browser storage.']
+  ];
+  document.getElementById('faqList').innerHTML = faqs.map(([q,a]) => `
+    <div class="faq-item"><div class="faq-q">${q}<span class="chev">⌄</span></div><div class="faq-a">${a}</div></div>
+  `).join('');
+  document.querySelectorAll('.faq-item').forEach(item => item.querySelector('.faq-q').addEventListener('click', () => item.classList.toggle('open')));
+</script>
+</body>
+</html>

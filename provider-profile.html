@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provider Profile — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main>
+  <div id="profileCover" style="height:260px; background-size:cover; background-position:center;"></div>
+  <div class="container" style="margin-top:-60px; position:relative;">
+    <div class="breadcrumbs" style="margin-top:76px"><a href="index.html">Home</a> / <a href="providers.html">Providers</a> / <span id="crumbName"></span></div>
+
+    <div class="card" style="padding:28px; display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap; margin-bottom:32px;">
+      <div id="profileLogo" style="width:88px; height:88px; border-radius:20px; background:var(--paper-dim); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:700; color:var(--teal); flex-shrink:0;"></div>
+      <div style="flex:1; min-width:220px;">
+        <h1 id="profileName" style="font-size:1.8rem;"></h1>
+        <div class="rating" id="profileRating" style="margin:8px 0;"></div>
+        <div class="cats" id="profileChips"></div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-ghost" id="followBtn">＋ Follow</button>
+        <a href="#" id="bookBtn" class="btn btn-primary">Book Now</a>
+      </div>
+    </div>
+
+    <div class="tabs" data-tabgroup="profile">
+      <button class="active" data-tab="about">About</button>
+      <button data-tab="services">Services</button>
+      <button data-tab="gallery">Gallery</button>
+      <button data-tab="reviews">Reviews</button>
+      <button data-tab="posts">Posts</button>
+    </div>
+
+    <div data-tabpanel="profile" data-tab="about">
+      <div class="grid grid-2">
+        <div class="card" style="padding:26px;">
+          <h3>About</h3>
+          <p id="profileAbout" style="margin-top:12px;"></p>
+          <h3 style="margin-top:24px;">Working Hours</h3>
+          <p id="profileHours" style="margin-top:8px;"></p>
+        </div>
+        <div class="card" style="padding:26px;">
+          <h3>Contact & Location</h3>
+          <p style="margin-top:12px;" id="profileEmail"></p>
+          <p id="profileCity"></p>
+          <div style="margin-top:16px; height:160px; border-radius:var(--r-md); background:var(--paper-dim); display:flex; align-items:center; justify-content:center; color:var(--ink-soft);">📍 Map placeholder</div>
+        </div>
+      </div>
+    </div>
+
+    <div data-tabpanel="profile" data-tab="services" style="display:none;">
+      <div class="grid grid-3" id="profileServices"></div>
+    </div>
+
+    <div data-tabpanel="profile" data-tab="gallery" style="display:none;">
+      <div class="grid grid-4" id="profileGallery"></div>
+    </div>
+
+    <div data-tabpanel="profile" data-tab="reviews" style="display:none;">
+      <div class="card" style="padding:22px; margin-bottom:20px; display:flex; align-items:center; gap:20px;">
+        <div><h2 id="avgRating" style="font-size:2.4rem"></h2><div class="rating" id="avgStars"></div></div>
+        <p style="flex:1">Based on real bookings completed through Pawstop.</p>
+        <button class="btn btn-secondary" id="writeReviewBtn">Write a Review</button>
+      </div>
+      <div id="profileReviews" style="display:flex; flex-direction:column; gap:16px;"></div>
+    </div>
+
+    <div data-tabpanel="profile" data-tab="posts" style="display:none;">
+      <div class="grid grid-3" id="profilePosts"></div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-head"><h3>Write a Review</h3><button class="modal-close" onclick="PAWSTOP.ui.closeModal('reviewModal')">✕</button></div>
+    <div class="modal-body">
+      <form id="reviewForm">
+        <div class="form-group">
+          <label>Your Rating</label>
+          <div class="star-input" id="starInput">
+            <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+          </div>
+          <input type="hidden" name="rating" value="5">
+        </div>
+        <div class="form-group">
+          <label>Your Review</label>
+          <textarea class="form-control" name="text" placeholder="Share how it went..." required></textarea>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Submit Review</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/providers.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = window.PAWSTOP.db;
+  NS.ui.mountChrome('providers', '');
+
+  const params = new URLSearchParams(location.search);
+  const provider = db.find('providers', params.get('id')) || db.get('providers')[0];
+
+  document.getElementById('profileCover').style.backgroundImage = `url('${provider.cover}')`;
+  document.getElementById('crumbName').textContent = provider.name;
+  document.getElementById('profileLogo').textContent = provider.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+  document.getElementById('profileName').textContent = provider.name;
+  document.getElementById('profileRating').innerHTML = `<span class="stars">${NS.ui.starString(provider.rating)}</span><span>${provider.rating} · ${provider.reviews} reviews · ${provider.followers} followers</span>`;
+  document.getElementById('profileChips').innerHTML = [
+    db.CATEGORIES.find(c=>c.id===provider.category)?.name || provider.category, provider.city, provider.experience+'+ yrs', provider.priceRange
+  ].map(t => `<span class="chip">${t}</span>`).join('');
+  document.getElementById('profileAbout').textContent = provider.about;
+  document.getElementById('profileHours').textContent = provider.hours;
+  document.getElementById('profileEmail').textContent = '✉️ ' + provider.email;
+  document.getElementById('profileCity').textContent = '📍 ' + provider.city;
+  document.getElementById('bookBtn').href = 'booking.html?provider=' + provider.id;
+
+  const services = db.get('services').filter(s => s.providerId === provider.id);
+  document.getElementById('profileServices').innerHTML = services.length ? services.map(s => NS.cards.serviceCardHTML(s, provider, '')).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No services listed yet.</p></div>`;
+
+  document.getElementById('profileGallery').innerHTML = services.map(s => `<img src="${s.image}" style="border-radius:var(--r-md); aspect-ratio:1; object-fit:cover;">`).join('') || `<div class="empty-state" style="grid-column:1/-1"><p>No gallery images yet.</p></div>`;
+
+  function renderReviews(){
+    const reviews = db.get('reviews').filter(r => r.providerId === provider.id).sort((a,b)=>b.date-a.date);
+    const avg = reviews.length ? (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length) : 0;
+    document.getElementById('avgRating').textContent = avg.toFixed(1);
+    document.getElementById('avgStars').innerHTML = `<span class="stars">${NS.ui.starString(avg)}</span><span>${reviews.length} reviews</span>`;
+    document.getElementById('profileReviews').innerHTML = reviews.map(r => `
+      <div class="card" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between;">
+          <div style="display:flex; gap:10px; align-items:center;"><span class="testi-card .av"></span><strong>${r.author}</strong></div>
+          <span class="stars">${NS.ui.starString(r.rating)}</span>
+        </div>
+        <p style="margin-top:10px;">${r.text}</p>
+        <div style="display:flex; gap:14px; margin-top:12px; font-size:.82rem; color:var(--ink-soft);">
+          <span>${new Date(r.date).toLocaleDateString()}</span><button style="border:none;background:none;color:var(--ink-soft);cursor:pointer;">👍 Helpful (${r.likes})</button>
+        </div>
+      </div>`).join('') || `<div class="empty-state"><p>No reviews yet — be the first!</p></div>`;
+  }
+  renderReviews();
+
+  const postsGrid = document.getElementById('profilePosts');
+  const posts = db.get('posts').filter(p => p.providerId === provider.id && p.status !== 'draft');
+  postsGrid.innerHTML = posts.length ? posts.map(p => NS.cards.postCardHTML(p, '')).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No posts yet.</p></div>`;
+  NS.cards.bindPostActions(postsGrid);
+
+  let followed = false;
+  document.getElementById('followBtn').addEventListener('click', () => {
+    followed = !followed;
+    document.getElementById('followBtn').textContent = followed ? '✓ Following' : '＋ Follow';
+    NS.ui.toast(followed ? `You're now following ${provider.name}.` : 'Unfollowed.');
+  });
+
+  const starInput = document.getElementById('starInput');
+  starInput.addEventListener('click', (e) => {
+    const span = e.target.closest('span'); if (!span) return;
+    const v = Number(span.dataset.v);
+    document.getElementById('reviewForm').rating.value = v;
+    [...starInput.children].forEach((s,i) => s.classList.toggle('filled', i < v));
+  });
+  [...starInput.children].forEach((s,i) => s.classList.toggle('filled', i < 5));
+
+  document.getElementById('writeReviewBtn').addEventListener('click', () => NS.ui.openModal('reviewModal'));
+  document.getElementById('reviewForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const session = NS.api.getUser();
+    const form = e.target;
+    db.add('reviews', { id: db.uid('rev'), providerId: provider.id, author: session ? session.name : 'Guest', rating: Number(form.rating.value), text: form.text.value.trim(), date: Date.now(), likes: 0 });
+    NS.ui.closeModal('reviewModal'); form.reset();
+    NS.ui.toast('Review submitted — thank you!');
+    renderReviews();
+  });
+</script>
+</body>
+</html>

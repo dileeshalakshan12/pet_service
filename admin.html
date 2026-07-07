@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/forms.css">
+<style>
+  .rte-toolbar{ display:flex; flex-wrap:wrap; gap:4px; padding:8px; border:1px solid var(--line); border-bottom:none; border-radius:var(--r-md) var(--r-md) 0 0; background:var(--paper-dim); }
+  .rte-toolbar button{
+    width:34px; height:34px; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--ink);
+    font-size:.95rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .rte-toolbar button:hover{ background:var(--card); border-color:var(--line); }
+  .rte-toolbar button.active{ background:var(--teal); color:#fff; }
+  .rte-toolbar .sep{ width:1px; background:var(--line); margin:4px 6px; }
+  .rte-body{
+    border:1px solid var(--line); border-radius:0 0 var(--r-md) var(--r-md); padding:20px; min-height:320px;
+    background:var(--card); font-size:.98rem; line-height:1.7; outline:none;
+  }
+  .rte-body h2{ font-size:1.4rem; margin:.6em 0 .3em; }
+  .rte-body h3{ font-size:1.15rem; margin:.6em 0 .3em; }
+  .rte-body ul, .rte-body ol{ padding-left:1.4em; margin:.4em 0; }
+  .rte-body blockquote{ border-left:3px solid var(--gold); padding-left:14px; color:var(--ink-soft); margin:.6em 0; }
+  .rte-body img{ max-width:100%; border-radius:var(--r-sm); margin:.6em 0; }
+  .rte-body:empty:before{ content: attr(data-placeholder); color:var(--ink-soft); }
+  .cover-drop{ border:2px dashed var(--line); border-radius:var(--r-md); padding:20px; text-align:center; cursor:pointer; color:var(--ink-soft); }
+  .cover-drop:hover{ border-color:var(--teal); color:var(--teal); }
+  .cover-preview{ height:160px; border-radius:var(--r-md); background-size:cover; background-position:center; margin-bottom:10px; display:none; }
+  .status-toggle{ display:flex; gap:8px; }
+  .status-toggle button{ flex:1; padding:10px; border-radius:var(--r-sm); border:1.5px solid var(--line); background:var(--card); font-weight:600; }
+  .status-toggle button.active{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 10%, transparent); color:var(--teal); }
+</style>
+</head>
+<body>
+<div id="headerMount"></div>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar" id="dashSidebar">
+    <span class="side-label">Content</span>
+    <a href="#" data-panel="list" class="active"><span class="ic">📰</span> All Articles</a>
+    <a href="#" data-panel="editor"><span class="ic">➕</span> New Article</a>
+    <span class="side-label">Account</span>
+    <a href="#" id="logoutLink"><span class="ic">🚪</span> Log Out</a>
+  </aside>
+
+  <div class="dash-main">
+    <div class="dash-header">
+      <div><button class="icon-btn mobile-toggle" id="sidebarToggle" style="display:none">☰</button><h1 id="pageTitle">Blog Admin</h1></div>
+      <button class="btn btn-primary" id="newArticleBtn">+ New Article</button>
+    </div>
+
+    <!-- ARTICLES LIST -->
+    <section data-panel-content="list">
+      <div class="tabs" data-tabgroup="articles">
+        <button class="active" data-tab="all">All</button>
+        <button data-tab="published">Published</button>
+        <button data-tab="draft">Drafts</button>
+      </div>
+      <div class="card" style="padding:8px 8px 20px;" data-tabpanel="articles" data-tab="all"><div id="listAll"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="articles" data-tab="published"><div id="listPublished"></div></div>
+      <div class="card" style="padding:8px 8px 20px; display:none" data-tabpanel="articles" data-tab="draft"><div id="listDraft"></div></div>
+    </section>
+
+    <!-- EDITOR (no-code) -->
+    <section data-panel-content="editor" style="display:none">
+      <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:flex-start;">
+        <div class="card" style="padding:26px;">
+          <div class="form-group">
+            <label>Title</label>
+            <input class="form-control" id="fTitle" placeholder="Give your article a title" style="font-size:1.2rem; font-family:var(--font-display);">
+            <span style="font-size:.78rem; color:var(--ink-soft);">URL: /article.html?slug=<span id="slugPreview">your-article-title</span></span>
+          </div>
+          <div class="form-group">
+            <label>Excerpt (shown on the blog list page)</label>
+            <textarea class="form-control" id="fExcerpt" rows="2" placeholder="A one or two sentence teaser..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Article Body</label>
+            <div class="rte-toolbar" id="rteToolbar">
+              <button type="button" data-cmd="formatBlock" data-val="h2" title="Heading">H2</button>
+              <button type="button" data-cmd="formatBlock" data-val="h3" title="Subheading">H3</button>
+              <button type="button" data-cmd="formatBlock" data-val="p" title="Paragraph">¶</button>
+              <div class="sep"></div>
+              <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+              <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+              <button type="button" data-cmd="underline" title="Underline"><u>U</u></button>
+              <div class="sep"></div>
+              <button type="button" data-cmd="insertUnorderedList" title="Bullet list">•≡</button>
+              <button type="button" data-cmd="insertOrderedList" title="Numbered list">1≡</button>
+              <button type="button" data-cmd="formatBlock" data-val="blockquote" title="Quote">❝</button>
+              <div class="sep"></div>
+              <button type="button" id="rteLinkBtn" title="Insert link">🔗</button>
+              <button type="button" id="rteImageBtn" title="Insert image">🖼️</button>
+              <button type="button" data-cmd="removeFormat" title="Clear formatting">⌫</button>
+            </div>
+            <div class="rte-body" id="rteBody" contenteditable="true" data-placeholder="Start writing... use the toolbar above for headings, lists, links, and images — no code needed."></div>
+            <input type="file" id="rteImageInput" accept="image/*" style="display:none;">
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="card" style="padding:22px;">
+            <h3 style="font-size:.95rem; margin-bottom:12px;">Status</h3>
+            <div class="status-toggle">
+              <button type="button" id="statusDraftBtn" class="active">Draft</button>
+              <button type="button" id="statusPublishedBtn">Published</button>
+            </div>
+            <button class="btn btn-primary btn-block" style="margin-top:16px;" id="saveArticleBtn">Save Article</button>
+            <button class="btn btn-ghost btn-block" style="margin-top:8px;" id="cancelEditBtn">Cancel</button>
+          </div>
+          <div class="card" style="padding:22px;">
+            <h3 style="font-size:.95rem; margin-bottom:12px;">Cover Image</h3>
+            <div class="cover-preview" id="coverPreview"></div>
+            <div class="cover-drop" id="coverDrop">📷 Click to upload a cover image</div>
+            <input type="file" id="coverInput" accept="image/*" style="display:none;">
+          </div>
+          <div class="card" style="padding:22px;">
+            <h3 style="font-size:.95rem; margin-bottom:12px;">Category & Tags</h3>
+            <div class="form-group">
+              <label>Category</label>
+              <select class="form-control" id="fCategory">
+                <option>Announcements</option><option>Care Tips</option><option>Health</option>
+                <option>Training</option><option>Community</option><option>Product Updates</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Tags (comma separated)</label>
+              <input class="form-control" id="fTags" placeholder="grooming, seasonal, tips">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script>
+  const NS = window.PAWSTOP, api = NS.api;
+  const session = NS.auth.requireAuth('admin');
+  if (session){
+    NS.ui.mountChrome('', '');
+    document.getElementById('pageTitle').textContent = `Blog Admin — ${session.name}`;
+
+    let editingId = null;
+    let currentStatus = 'draft';
+    let coverImageUrl = '';
+
+    /* ---------- panel switching ---------- */
+    const panels = document.querySelectorAll('[data-panel-content]');
+    function showPanel(name){
+      panels.forEach(p => p.style.display = p.dataset.panelContent === name ? '' : 'none');
+      document.querySelectorAll('[data-panel]').forEach(a => a.classList.toggle('active', a.dataset.panel === name));
+    }
+    document.querySelectorAll('[data-panel]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); showPanel(a.dataset.panel); }));
+
+    /* ---------- articles list ---------- */
+    function statusPillHTML(status){ return `<span class="status-pill ${status==='published'?'confirmed':'pending'}">${status}</span>`; }
+
+    async function loadList(){
+      try {
+        const { articles } = await api.call('GET', '/api/articles?all=1');
+        renderList('listAll', articles);
+        renderList('listPublished', articles.filter(a=>a.status==='published'));
+        renderList('listDraft', articles.filter(a=>a.status==='draft'));
+      } catch(err){ NS.ui.toast(err.error || 'Could not load articles.', 'error'); }
+    }
+    function renderList(elId, articles){
+      const el = document.getElementById(elId);
+      if (!articles.length){ el.innerHTML = `<div class="empty-state"><div class="icon">📰</div><p>No articles here yet.</p></div>`; return; }
+      el.innerHTML = `<table class="data-table"><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>
+        ${articles.map(a => `<tr>
+          <td><strong>${a.title}</strong></td>
+          <td>${a.category}</td>
+          <td>${statusPillHTML(a.status)}</td>
+          <td>${new Date(a.updatedAt).toLocaleDateString()}</td>
+          <td style="display:flex; gap:8px;">
+            <a class="btn btn-ghost btn-sm" href="article.html?slug=${a.slug}" target="_blank">View</a>
+            <button class="btn btn-ghost btn-sm edit-art" data-id="${a.id}">Edit</button>
+            <button class="btn btn-ghost btn-sm del-art" data-id="${a.id}" style="color:var(--danger)">Delete</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+    document.querySelectorAll('[data-tabpanel="articles"]').forEach(panel => {
+      panel.addEventListener('click', async (e) => {
+        const editBtn = e.target.closest('.edit-art');
+        const delBtn = e.target.closest('.del-art');
+        if (editBtn) openEditor(editBtn.dataset.id);
+        if (delBtn){
+          if (!confirm('Delete this article permanently?')) return;
+          try { await api.call('DELETE', '/api/articles/' + delBtn.dataset.id); NS.ui.toast('Article deleted.'); loadList(); }
+          catch(err){ NS.ui.toast(err.error || 'Could not delete.', 'error'); }
+        }
+      });
+    });
+    loadList();
+
+    /* ---------- editor: status toggle ---------- */
+    function setStatus(s){
+      currentStatus = s;
+      document.getElementById('statusDraftBtn').classList.toggle('active', s==='draft');
+      document.getElementById('statusPublishedBtn').classList.toggle('active', s==='published');
+    }
+    document.getElementById('statusDraftBtn').addEventListener('click', () => setStatus('draft'));
+    document.getElementById('statusPublishedBtn').addEventListener('click', () => setStatus('published'));
+
+    /* ---------- editor: slug preview ---------- */
+    const titleInput = document.getElementById('fTitle');
+    titleInput.addEventListener('input', () => {
+      const slug = titleInput.value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');
+      document.getElementById('slugPreview').textContent = slug || 'your-article-title';
+    });
+
+    /* ---------- editor: rich text toolbar (no code required — just clicks) ---------- */
+    const rteBody = document.getElementById('rteBody');
+    document.getElementById('rteToolbar').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cmd]');
+      if (!btn) return;
+      rteBody.focus();
+      document.execCommand(btn.dataset.cmd, false, btn.dataset.val || null);
+    });
+    document.getElementById('rteLinkBtn').addEventListener('click', () => {
+      const url = prompt('Paste a link URL:');
+      if (url) { rteBody.focus(); document.execCommand('createLink', false, url); }
+    });
+    document.getElementById('rteImageBtn').addEventListener('click', () => document.getElementById('rteImageInput').click());
+    document.getElementById('rteImageInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        const url = await api.uploadImage(file);
+        rteBody.focus();
+        document.execCommand('insertImage', false, url);
+        NS.ui.toast('Image inserted.');
+      } catch(err){ NS.ui.toast(err.error || 'Image upload failed.', 'error'); }
+      e.target.value = '';
+    });
+
+    /* ---------- editor: cover image ---------- */
+    document.getElementById('coverDrop').addEventListener('click', () => document.getElementById('coverInput').click());
+    document.getElementById('coverInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        coverImageUrl = await api.uploadImage(file);
+        const preview = document.getElementById('coverPreview');
+        preview.style.backgroundImage = `url('${coverImageUrl}')`; preview.style.display = 'block';
+        NS.ui.toast('Cover image uploaded.');
+      } catch(err){ NS.ui.toast(err.error || 'Upload failed.', 'error'); }
+    });
+
+    /* ---------- new / edit / cancel ---------- */
+    function resetEditor(){
+      editingId = null; coverImageUrl = '';
+      titleInput.value = ''; document.getElementById('fExcerpt').value = ''; document.getElementById('fTags').value = '';
+      document.getElementById('fCategory').value = 'Announcements';
+      rteBody.innerHTML = ''; document.getElementById('slugPreview').textContent = 'your-article-title';
+      document.getElementById('coverPreview').style.display = 'none';
+      setStatus('draft');
+    }
+    document.getElementById('newArticleBtn').addEventListener('click', () => { resetEditor(); showPanel('editor'); });
+    document.getElementById('cancelEditBtn').addEventListener('click', () => showPanel('list'));
+
+    async function openEditor(id){
+      try {
+        const { articles } = await api.call('GET', '/api/articles?all=1');
+        const a = articles.find(x => x.id === id);
+        if (!a) return;
+        editingId = a.id;
+        titleInput.value = a.title;
+        document.getElementById('slugPreview').textContent = a.slug;
+        document.getElementById('fExcerpt').value = a.excerpt || '';
+        document.getElementById('fCategory').value = a.category || 'Announcements';
+        document.getElementById('fTags').value = (a.tags||[]).join(', ');
+        rteBody.innerHTML = a.bodyHtml || '';
+        coverImageUrl = a.coverImage || '';
+        const preview = document.getElementById('coverPreview');
+        if (coverImageUrl){ preview.style.backgroundImage = `url('${coverImageUrl}')`; preview.style.display = 'block'; } else preview.style.display = 'none';
+        setStatus(a.status);
+        showPanel('editor');
+      } catch(err){ NS.ui.toast(err.error || 'Could not load article.', 'error'); }
+    }
+
+    /* ---------- save ---------- */
+    document.getElementById('saveArticleBtn').addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      if (!title){ NS.ui.toast('Please add a title before saving.', 'error'); titleInput.focus(); return; }
+      if (!rteBody.innerHTML.trim()){ NS.ui.toast('Please write some article content.', 'error'); return; }
+
+      const payload = {
+        title, excerpt: document.getElementById('fExcerpt').value.trim(), bodyHtml: rteBody.innerHTML,
+        coverImage: coverImageUrl || null, category: document.getElementById('fCategory').value,
+        tags: document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+        status: currentStatus
+      };
+      const saveBtn = document.getElementById('saveArticleBtn');
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try {
+        if (editingId) await api.call('PUT', '/api/articles/' + editingId, payload);
+        else await api.call('POST', '/api/articles', payload);
+        NS.ui.toast(currentStatus === 'published' ? 'Article published!' : 'Draft saved.');
+        showPanel('list'); loadList();
+      } catch(err){ NS.ui.toast(err.error || 'Could not save article.', 'error'); }
+      saveBtn.disabled = false; saveBtn.textContent = 'Save Article';
+    });
+
+    document.getElementById('logoutLink').addEventListener('click', (e) => { e.preventDefault(); NS.auth.logout(''); });
+  }
+</script>
+</body>
+</html>

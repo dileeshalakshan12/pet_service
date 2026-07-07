@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article — Pawstop Blog</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .article-body h2{ font-size:1.5rem; margin:1.2em 0 .4em; font-family:var(--font-display); }
+  .article-body h3{ font-size:1.2rem; margin:1.1em 0 .4em; font-family:var(--font-display); }
+  .article-body p{ margin-bottom:1em; }
+  .article-body ul, .article-body ol{ padding-left:1.4em; margin-bottom:1em; }
+  .article-body blockquote{ border-left:3px solid var(--gold); padding-left:16px; color:var(--ink-soft); margin:1em 0; }
+  .article-body img{ max-width:100%; border-radius:var(--r-md); margin:1em 0; }
+  .article-body a{ color:var(--teal); text-decoration:underline; }
+</style>
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main class="container section" style="max-width:760px;">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <a href="blog.html">Blog</a> / <span id="crumbTitle">Article</span></div>
+  <div id="articleWrap">
+    <div class="skeleton" style="height:280px; border-radius:var(--r-lg); margin-bottom:24px;"></div>
+    <div class="skeleton" style="height:32px; width:70%; margin-bottom:12px;"></div>
+    <div class="skeleton" style="height:16px; width:40%; margin-bottom:24px;"></div>
+  </div>
+</main>
+
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  const NS = window.PAWSTOP, api = NS.api;
+  NS.ui.mountChrome('blog', '');
+
+  (async function(){
+    const slug = new URLSearchParams(location.search).get('slug');
+    const wrap = document.getElementById('articleWrap');
+    if (!slug){ wrap.innerHTML = `<div class="empty-state"><p>No article specified.</p></div>`; return; }
+    try {
+      const { article } = await api.call('GET', '/api/articles/' + encodeURIComponent(slug));
+      document.title = article.title + ' — Pawstop Blog';
+      document.getElementById('crumbTitle').textContent = article.title;
+      wrap.innerHTML = `
+        ${article.coverImage ? `<img src="${article.coverImage}" style="width:100%; height:320px; object-fit:cover; border-radius:var(--r-lg); margin-bottom:28px;">` : ''}
+        <span class="eyebrow">${article.category}</span>
+        <h1 style="margin:10px 0 14px;">${article.title}</h1>
+        <div style="display:flex; gap:14px; align-items:center; color:var(--ink-soft); font-size:.9rem; margin-bottom:32px;">
+          <span>By ${article.authorName || 'Pawstop Team'}</span>·<span>${new Date(article.publishedAt || article.createdAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}</span>
+        </div>
+        <div class="article-body">${article.bodyHtml}</div>
+        <div class="tags" style="margin-top:32px; display:flex; gap:8px; flex-wrap:wrap;">${(article.tags||[]).map(t=>`<span class="chip">#${t}</span>`).join('')}</div>
+      `;
+    } catch(err){
+      wrap.innerHTML = `<div class="empty-state"><div class="icon">📰</div><p>${err.error || 'Article not found.'}</p></div>`;
+    }
+  })();
+</script>
+</body>
+</html>

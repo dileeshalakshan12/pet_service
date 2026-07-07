@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main class="container section">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <span>Services</span></div>
+  <div class="section-head" style="max-width:none">
+    <span class="eyebrow">Browse</span>
+    <h2>All pet care services</h2>
+  </div>
+
+  <div class="filter-pills" id="catFilters" style="margin-bottom:28px;"></div>
+
+  <div style="display:grid; grid-template-columns:1fr; gap:24px;">
+    <div class="grid grid-3" id="servicesGrid"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</main>
+
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/providers.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = NS.db;
+  NS.ui.mountChrome('services', '');
+
+  const providers = db.get('providers');
+  let allServices = db.get('services');
+  const params = new URLSearchParams(location.search);
+  let activeCat = params.get('cat') || '';
+  const PAGE_SIZE = 9;
+  let page = 1;
+
+  function renderFilters(){
+    const pills = [`<button class="filter-pill ${!activeCat?'active':''}" data-cat="">All</button>`]
+      .concat(db.CATEGORIES.map(c => `<button class="filter-pill ${activeCat===c.id?'active':''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`));
+    document.getElementById('catFilters').innerHTML = pills.join('');
+  }
+
+  function renderGrid(){
+    let list = activeCat ? allServices.filter(s => s.category === activeCat) : allServices;
+    const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+    page = Math.min(page, totalPages);
+    const slice = list.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
+    const grid = document.getElementById('servicesGrid');
+    if (!slice.length){
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🐾</div><p>No services found in this category yet.</p></div>`;
+    } else {
+      grid.innerHTML = slice.map(s => NS.cards.serviceCardHTML(s, providers.find(p=>p.id===s.providerId), '')).join('');
+    }
+    NS.ui.initReveal();
+
+    const pag = document.getElementById('pagination');
+    pag.innerHTML = '';
+    for (let i=1;i<=totalPages;i++){
+      pag.innerHTML += `<button class="${i===page?'active':''}" data-page="${i}">${i}</button>`;
+    }
+  }
+
+  document.getElementById('catFilters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-pill');
+    if (!btn) return;
+    activeCat = btn.dataset.cat; page = 1;
+    renderFilters(); renderGrid();
+  });
+  document.getElementById('pagination').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    page = Number(btn.dataset.page);
+    renderGrid();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  renderFilters(); renderGrid();
+</script>
+</body>
+</html>

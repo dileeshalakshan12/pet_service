@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Providers — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main class="container section">
+  <div class="breadcrumbs"><a href="index.html">Home</a> / <span>Providers</span></div>
+  <div class="section-head" style="max-width:none">
+    <span class="eyebrow">Directory</span>
+    <h2>Find a trusted pet care provider</h2>
+  </div>
+
+  <div style="display:grid; grid-template-columns:260px 1fr; gap:32px; align-items:flex-start;" id="providerLayout">
+    <aside class="card" style="padding:24px; position:sticky; top:100px;">
+      <h3 style="margin-bottom:16px;">Filters</h3>
+      <div class="form-group">
+        <label>Search by name</label>
+        <input class="form-control" id="fName" placeholder="e.g. Wag & Wash">
+      </div>
+      <div class="form-group">
+        <label>City</label>
+        <input class="form-control" id="fCity" placeholder="Colombo, Kandy…">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select class="form-control" id="fCat"><option value="">Any</option></select>
+      </div>
+      <div class="form-group">
+        <label>Minimum Rating</label>
+        <select class="form-control" id="fRating">
+          <option value="0">Any</option><option value="4">4.0+</option><option value="4.5">4.5+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="check-row"><input type="checkbox" id="fAvail"> Available today only</label>
+      </div>
+      <button class="btn btn-primary btn-block" id="clearFilters">Clear Filters</button>
+    </aside>
+
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <span id="resultCount" style="color:var(--ink-soft); font-size:.9rem;"></span>
+        <select class="form-control" id="sortBy" style="width:auto;">
+          <option value="rating">Sort: Top Rated</option>
+          <option value="reviews">Sort: Most Reviewed</option>
+          <option value="experience">Sort: Most Experienced</option>
+        </select>
+      </div>
+      <div class="grid grid-3" id="providersGrid"></div>
+    </div>
+  </div>
+</main>
+
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/providers.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = NS.db;
+  NS.ui.mountChrome('providers', '');
+
+  const all = db.get('providers');
+  db.CATEGORIES.forEach(c => document.getElementById('fCat').add(new Option(c.name, c.id)));
+
+  const params = new URLSearchParams(location.search);
+  if (params.get('cat')) document.getElementById('fCat').value = params.get('cat');
+  if (params.get('city')) document.getElementById('fCity').value = params.get('city');
+
+  function applyFilters(){
+    const name = document.getElementById('fName').value.toLowerCase();
+    const city = document.getElementById('fCity').value.toLowerCase();
+    const cat = document.getElementById('fCat').value;
+    const minRating = Number(document.getElementById('fRating').value);
+    const availOnly = document.getElementById('fAvail').checked;
+    const sortBy = document.getElementById('sortBy').value;
+
+    let list = all.filter(p =>
+      (!name || p.name.toLowerCase().includes(name)) &&
+      (!city || p.city.toLowerCase().includes(city)) &&
+      (!cat || p.category === cat) &&
+      (Number(p.rating) >= minRating) &&
+      (!availOnly || p.availableToday)
+    );
+    list.sort((a,b) => Number(b[sortBy]) - Number(a[sortBy]));
+
+    document.getElementById('resultCount').textContent = `${list.length} provider${list.length!==1?'s':''} found`;
+    const grid = document.getElementById('providersGrid');
+    grid.innerHTML = list.length ? list.map(p => NS.cards.providerCardHTML(p, '')).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>No providers match your filters.</p></div>`;
+    NS.ui.initReveal();
+  }
+
+  ['fName','fCity','fCat','fRating','fAvail','sortBy'].forEach(id => {
+    document.getElementById(id).addEventListener('input', applyFilters);
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    document.getElementById('fName').value=''; document.getElementById('fCity').value='';
+    document.getElementById('fCat').value=''; document.getElementById('fRating').value='0';
+    document.getElementById('fAvail').checked=false; applyFilters();
+  });
+
+  applyFilters();
+</script>
+</body>
+</html>

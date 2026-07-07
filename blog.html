@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Pawstop</title>
+<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<div id="headerMount"></div>
+<main class="container section">
+  <div class="section-head" style="max-width:none;">
+    <span class="eyebrow">The Pawstop Blog</span>
+    <h2>Care tips, spotlights &amp; updates</h2>
+    <p class="lede">Written by the Pawstop team through our admin editor — no code, just good content.</p>
+  </div>
+  <div class="grid grid-3" id="articlesGrid">
+    <div class="skeleton" style="height:300px;"></div>
+    <div class="skeleton" style="height:300px;"></div>
+    <div class="skeleton" style="height:300px;"></div>
+  </div>
+
+  <div class="section-head" style="max-width:none; margin-top:40px;">
+    <span class="eyebrow">From our providers</span>
+    <h2>Social Feed &amp; Promotions</h2>
+  </div>
+  <div class="filter-pills" id="feedFilters" style="margin-bottom:28px;"></div>
+  <div class="grid grid-3" id="feedGrid"></div>
+</main>
+<div id="footerMount"></div>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/providers.js"></script>
+<script>
+  const NS = window.PAWSTOP, db = NS.db, api = NS.api;
+  NS.ui.mountChrome('blog', '');
+
+  /* ---------- real CMS articles ---------- */
+  function articleCardHTML(a){
+    return `
+    <a class="card svc-card reveal" href="article.html?slug=${a.slug}" style="text-decoration:none;">
+      <div class="thumb" style="background-image:url('${a.coverImage || 'https://picsum.photos/seed/'+a.id+'/500/320'}')"><span class="tag">${a.category}</span></div>
+      <div class="body">
+        <h3>${a.title}</h3>
+        <p style="font-size:.88rem">${a.excerpt || ''}</p>
+        <span style="font-size:.78rem; color:var(--ink-soft); margin-top:auto; padding-top:8px;">${new Date(a.publishedAt || a.createdAt).toLocaleDateString()}</span>
+      </div>
+    </a>`;
+  }
+  (async function(){
+    try {
+      const { articles } = await api.call('GET', '/api/articles');
+      const grid = document.getElementById('articlesGrid');
+      grid.innerHTML = articles.length ? articles.map(articleCardHTML).join('') : `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📰</div><p>No articles published yet — check back soon.</p></div>`;
+      NS.ui.initReveal();
+    } catch(err){
+      document.getElementById('articlesGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>${err.error || 'Could not load articles.'}</p></div>`;
+    }
+  })();
+
+  /* ---------- provider social feed (still local demo data) ---------- */
+  let allPosts = db.get('posts').filter(p => p.status !== 'draft');
+  let activeCat = '';
+  function renderFilters(){
+    const pills = [`<button class="filter-pill ${!activeCat?'active':''}" data-cat="">All</button>`]
+      .concat(db.CATEGORIES.map(c => `<button class="filter-pill ${activeCat===c.id?'active':''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`));
+    document.getElementById('feedFilters').innerHTML = pills.join('');
+  }
+  function renderGrid(){
+    const list = activeCat ? allPosts.filter(p=>p.category===activeCat) : allPosts;
+    const grid = document.getElementById('feedGrid');
+    grid.innerHTML = list.length ? list.map(p => NS.cards.postCardHTML(p, '')).join('') : `<div class="empty-state" style="grid-column:1/-1"><p>No posts in this category yet.</p></div>`;
+    NS.cards.bindPostActions(grid);
+    NS.ui.initReveal();
+  }
+  document.getElementById('feedFilters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-pill'); if (!btn) return;
+    activeCat = btn.dataset.cat; renderFilters(); renderGrid();
+  });
+  renderFilters(); renderGrid();
+</script>
+</body>
+</html>

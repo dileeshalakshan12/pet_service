@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — Pawstop</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+<div id="headerMount"></div>
+
+<main class="auth-shell">
+  <div class="auth-visual">
+    <div style="color:#fff; max-width:380px;">
+      <div style="font-size:3rem; margin-bottom:16px;">🐾</div>
+      <h2 style="color:#fff; margin-bottom:12px;">Good things happen when pets are cared for well.</h2>
+      <p style="color:rgba(255,255,255,.8);">Log in to manage your pets, bookings, and messages — or switch to your provider dashboard.</p>
+    </div>
+  </div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <a href="login.html" class="active">Log In</a>
+      <a href="register.html">Sign Up</a>
+    </div>
+    <h2 style="margin-bottom:8px;">Welcome back</h2>
+    <p style="margin-bottom:26px;">Log in to continue to your dashboard.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group" data-field="email">
+        <label>Email</label>
+        <input class="form-control" type="email" name="email" placeholder="you@example.com">
+        <span class="form-error"></span>
+      </div>
+      <div class="form-group" data-field="password">
+        <label>Password</label>
+        <input class="form-control" type="password" name="password" placeholder="••••••••">
+        <span class="form-error"></span>
+      </div>
+      <div class="check-row" style="justify-content:space-between; margin-bottom:20px;">
+        <label class="check-row"><input type="checkbox"> Remember me</label>
+        <a href="#" style="color:var(--teal); font-size:.85rem;">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Log In</button>
+    </form>
+
+    <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-block btn-sm" id="fillDemo" type="button">Use Demo Customer</button>
+      <button class="btn btn-ghost btn-block btn-sm" id="fillDemoProvider" type="button">Use Demo Provider</button>
+      <button class="btn btn-ghost btn-block btn-sm" id="fillDemoAdmin" type="button">Use Demo Admin</button>
+    </div>
+    <p style="text-align:center; margin-top:24px; font-size:.9rem;">Don't have an account? <a href="register.html" style="color:var(--teal); font-weight:600;">Sign up</a></p>
+  </div>
+</main>
+
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+<script>window.PAWSTOP.ui.mountChrome('', '');</script>
+</body>
+</html>
