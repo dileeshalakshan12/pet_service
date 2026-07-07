@@ -1,0 +1,16 @@
+/* ===========================================================
+   forms.css — role-selector cards & auth-specific form styling
+   =========================================================== */
+
+.role-cards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.role-card{
+  border:1.5px solid var(--line); border-radius:var(--r-md); padding:16px; cursor:pointer; text-align:center; transition:.2s;
+}
+.role-card input{ display:none; }
+.role-card .r-icon{ font-size:1.6rem; margin-bottom:6px; }
+.role-card strong{ display:block; font-size:.9rem; }
+.role-card span{ font-size:.76rem; color:var(--ink-soft); }
+.role-card.active-role{ border-color:var(--teal); background:color-mix(in srgb, var(--teal) 8%, transparent); }
+
+.password-strength{ height:4px; border-radius:2px; background:var(--line); margin-top:8px; overflow:hidden; }
+.password-strength .bar{ height:100%; width:0%; background:var(--danger); transition:.3s; }

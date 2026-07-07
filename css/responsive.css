@@ -1,0 +1,52 @@
+/* ===========================================================
+   Responsive rules — mobile-first overrides at wider breakpoints
+   =========================================================== */
+
+/* base (mobile) adjustments live here since desktop styles are default in style.css */
+.nav-links{ display:none; }
+.mobile-toggle{ display:flex; }
+.hero{ grid-template-columns:1fr; padding:32px 0 20px; }
+.hero-visual{ order:-1; aspect-ratio:16/10; }
+.hero-stats{ flex-wrap:wrap; gap:24px; }
+.grid-4{ grid-template-columns:1fr 1fr; }
+.grid-3{ grid-template-columns:1fr; }
+.grid-2{ grid-template-columns:1fr; }
+.footer-grid{ grid-template-columns:1fr 1fr; gap:28px; }
+.search-bar{ flex-direction:column; border-radius:var(--r-md); }
+.search-bar .divider{ display:none; }
+.search-bar .btn{ margin:8px 4px 4px; }
+.stats-band{ grid-template-columns:1fr 1fr; }
+.auth-shell{ grid-template-columns:1fr; }
+.auth-visual{ display:none; }
+.form-row{ grid-template-columns:1fr; }
+.section{ padding:56px 0; }
+.cta-band{ padding:40px 24px; }
+
+@media (min-width:640px){
+  .grid-4{ grid-template-columns:repeat(2,1fr); }
+  .grid-3{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (min-width:900px){
+  .nav-links{ display:flex; }
+  .mobile-toggle{ display:none; }
+  .mobile-menu{ display:none !important; }
+  .hero{ grid-template-columns:1.1fr .9fr; padding:64px 0 40px; }
+  .hero-visual{ order:0; aspect-ratio:1/1; }
+  .grid-4{ grid-template-columns:repeat(4,1fr); }
+  .grid-3{ grid-template-columns:repeat(3,1fr); }
+  .grid-2{ grid-template-columns:repeat(2,1fr); }
+  .footer-grid{ grid-template-columns:1.4fr 1fr 1fr 1fr 1fr; }
+  .stats-band{ grid-template-columns:repeat(4,1fr); }
+  .auth-shell{ grid-template-columns:1fr 1fr; }
+  .auth-visual{ display:flex; }
+  .form-row{ grid-template-columns:1fr 1fr; }
+  .section{ padding:88px 0; }
+}
+
+@media (max-width:900px){
+  .leash-rail, .leash-stop{ display:none; }
+  .dash-shell{ grid-template-columns:1fr !important; }
+  .dash-sidebar{ position:fixed; left:0; top:var(--header-h); bottom:0; transform:translateX(-100%); z-index:90; transition:transform .3s var(--ease); }
+  .dash-sidebar.open{ transform:translateX(0); }
+}

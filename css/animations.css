@@ -1,0 +1,25 @@
+/* ===========================================================
+   animations.css — motion utilities layered on top of style.css
+   =========================================================== */
+
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(18px);} to{ opacity:1; transform:none; } }
+@keyframes fadeIn{ from{ opacity:0;} to{ opacity:1;} }
+@keyframes floatY{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+@keyframes pawPulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.08);} }
+@keyframes wag{ 0%,100%{ transform:rotate(0deg);} 25%{ transform:rotate(-6deg);} 75%{ transform:rotate(6deg);} }
+
+.hero-visual svg text{ animation:floatY 4.5s ease-in-out infinite; }
+.hero-badge .paw{ animation:wag 2.4s ease-in-out infinite; }
+.cat-card:hover .cat-icon{ animation:pawPulse .6s ease; }
+.brand-mark{ transition:transform .3s var(--ease); }
+.brand:hover .brand-mark{ transform:rotate(-8deg) scale(1.08); }
+
+.stagger > *{ animation:fadeUp .6s var(--ease) both; }
+.stagger > *:nth-child(1){ animation-delay:.03s; }
+.stagger > *:nth-child(2){ animation-delay:.09s; }
+.stagger > *:nth-child(3){ animation-delay:.15s; }
+.stagger > *:nth-child(4){ animation-delay:.21s; }
+
+@media (prefers-reduced-motion: reduce){
+  .hero-visual svg text, .hero-badge .paw{ animation:none; }
+}
